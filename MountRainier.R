@@ -1,5 +1,6 @@
+
 ## Mastering Rayschader by Milos Popovic
-## Mount Fuji   
+## Mount Rainier
 
 
 
@@ -47,14 +48,13 @@ set.seed(42)
 
 
 
-# Get and transform Mount Fuji data
-# 1. Define our location of interest in WGS84 (lon/lat!!!)
-fuji_aoi_ll <- sf::st_point(c(138.7307, 35.3628)) |>
+# Get and transform Mount Rainier data
+# 1. Define our location of interest in WGS84 (lon/lat!!)
+rainier_aoi_ll <- sf::st_point(c(-121.7604, 46.8529)) |>
         sf::st_sfc(crs = "EPSG:4326")
 
-
 # 2. Calculate the appropriate UTM zone and EPSG code
-lon0 <- sf::st_coordinates(sf::st_centroid(fuji_aoi_ll))[1]
+lon0 <- sf::st_coordinates(sf::st_centroid(rainier_aoi_ll))[1]
 utm_zone <- floor((lon0 + 180) / 6) + 1 
 utm_crs <- paste0("EPSG:", 32600+ utm_zone) 
 
@@ -62,7 +62,7 @@ utm_crs <- paste0("EPSG:", 32600+ utm_zone)
 # 3. Download the DEM in WGS84,
 # then reproject to our UTM zone
 dem_ll <- elevatr::get_elev_raster(
-        locations = fuji_aoi_ll,
+        locations = rainier_aoi_ll,
         z = 10 # Zoom level
 )
 
@@ -85,7 +85,7 @@ terra::writeRaster(
         dem_utm,
         here::here(
                 "data", "derived",
-                "fuji_dem_utm.tif"
+                "rainier_dem_utm.tif"
         ),
         overwrite = TRUE
 )
@@ -107,9 +107,8 @@ nuuk_pal <- scico::scico(100, palette = "nuuk")
 terra::plot(
         dem_utm,
         col = nuuk_pal,
-        main = "Mount Fuji Elevation (m)"
+        main = "Mount Rainier Elevation (m)"
 )
-
 
 # Generate CVD-simulated versions of our nuuk palette
 nuuk_deutan <- colorspace::deutan(nuuk_pal)
@@ -144,7 +143,7 @@ terra::plot(
 
 # The minimal 3D render
 # First, convert our raster object to a matrix
-fuji_matrix <- rayshader::raster_to_matrix(
+rainier_matrix <- rayshader::raster_to_matrix(
         dem_utm
 )
 
@@ -154,24 +153,24 @@ nuuk_texture <- scico::scico(256, palette = "nuuk")
 
 
 # Then, we build our 3D map layer by layer
-fuji_matrix |>
+rainier_matrix |>
         rayshader::height_shade(
                 texture = nuuk_texture
         ) |>
         rayshader::add_shadow(
                 rayshader::ray_shade(
-                        fuji_matrix,
+                        rainier_matrix,
                         zscale = 30
                 ), 0.6
         ) |>
         rayshader::add_shadow(
                 rayshader::lamb_shade(
-                        fuji_matrix,
+                        rainier_matrix,
                         zscale = 30
                 ), 0.6
         ) |>
         rayshader::plot_3d(
-                fuji_matrix,
+                rainier_matrix,
                 zscale = 30,
                 theta = 135,
                 phi = 30,
@@ -195,24 +194,24 @@ nuuk_texture <- scico::scico(256, palette = "nuuk")
 
 # Re-run the plot_3d command
 # with our nuuk palette
-fuji_matrix |>
+rainier_matrix |>
         rayshader::height_shade(
                 texture = nuuk_texture
         ) |>
         rayshader::add_shadow(
                 rayshader::ray_shade(
-                        fuji_matrix,
+                        rainier_matrix,
                         zscale = 30
                 ), 0.6
         ) |>
         rayshader::add_shadow(
                 rayshader::lamb_shade(
-                        fuji_matrix,
+                        rainier_matrix,
                         zscale = 30
                 ), 0.6
         ) |>
         rayshader::plot_3d(
-                fuji_matrix,
+                rainier_matrix,
                 zscale = 30,
                 theta = 135,
                 phi = 30,
@@ -224,10 +223,10 @@ fuji_matrix |>
 rayshader::render_snapshot(
         filename = here::here(
                 "outputs", "images",
-                "plot1_2.png"
+                "plot1_5.png"
         ),
-        title_text = "Mount Fuji, Japan",
-        title_bar_color = "#1e3d59",
+        title_text = "Mount Rainier, WA, USA",
+        title_bar_color = "violet",
         title_color = "white",
         vignette = 0.2,
         width = 2400,
@@ -259,7 +258,7 @@ if (render_quality == "preview") {
 rayshader::render_highquality(
         filename = here::here(
                 "outputs", "images",
-                "plot1_4.png"
+                "plot1_6.png"
         ),
         samples = samples,
         preview = preview,
@@ -267,7 +266,7 @@ rayshader::render_highquality(
         lightdirection = 315,
         lightaltitude = 80,
         lightsize = 50,
-        lightintensity = 1000,
+        lightintensity = 1500,
         lightcolor = "white",
         intensity_env = 0.3,
         width = width,
