@@ -140,7 +140,7 @@ test_shade <- rayshader::sphere_shade(volcano_matrix)
 
 # Fast preview vs final output option
 # Use "final" for publication export
-render_mode <- "final"
+render_mode <- "preview"
 
 
 if (render_mode == "preview") {
